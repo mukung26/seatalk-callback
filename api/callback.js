@@ -1,8 +1,8 @@
-export default function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method === "POST") {
     let body = req.body;
 
-    // If Vercel hasn't parsed JSON automatically, parse raw body
+    // Fallback: parse raw body if needed
     if (!body || typeof body !== "object") {
       try {
         body = JSON.parse(req.rawBody || "{}");
@@ -11,13 +11,12 @@ export default function handler(req, res) {
       }
     }
 
-    // Handle SeaTalk verification
+    // SeaTalk verification
     if (body.seatalk_challenge) {
-      // Respond with the challenge string exactly
       return res.status(200).send(body.seatalk_challenge);
     }
 
-    // Handle actual events
+    // Log other events
     console.log("Received event:", body);
     return res.status(200).send("ok");
   }
