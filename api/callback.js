@@ -1,10 +1,20 @@
 export default function handler(req, res) {
   if (req.method === "POST") {
-    const body = req.body;
+    let body = req.body;
 
-    // Handle verification challenge
-    if (body.type === "url_verification") {
-      return res.status(200).send(body.challenge);
+    // If Vercel hasn't parsed JSON automatically, parse raw body
+    if (!body || typeof body !== "object") {
+      try {
+        body = JSON.parse(req.rawBody || "{}");
+      } catch (e) {
+        return res.status(400).send("Invalid JSON");
+      }
+    }
+
+    // Handle SeaTalk verification
+    if (body.seatalk_challenge) {
+      // Respond with the challenge string exactly
+      return res.status(200).send(body.seatalk_challenge);
     }
 
     // Handle actual events
